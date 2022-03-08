@@ -1,3 +1,5 @@
+import pickle
+from turtle import pos
 import pygame
 pygame.init()
 
@@ -8,17 +10,20 @@ GRAY = pygame.Color(100, 100, 100)
 class Game:
     # Should be divisible by 9
     WINDOW_SIZE = (450, 450)
+    STEP = int(WINDOW_SIZE[0] / 9)
+    TEXT_BUFFER = 10
 
-    def __init__(self):
+    def __init__(self, grid):
         self.window = pygame.display.set_mode(self.WINDOW_SIZE)
         self.window.fill(BLACK)
-        self._drawGrid()
+        self.grid = grid
+        self._drawLines()
+        self._drawNumbers(grid)
 
 
-    def _drawGrid(self):
+    def _drawLines(self):
         # Draw 8 evenly spaced lines for both x and y
-        step = int(self.WINDOW_SIZE[0] / 9)
-        for i in range(0 + step, self.WINDOW_SIZE[0], int(self.WINDOW_SIZE[0] / 9)):
+        for i in range(0 + self.STEP, self.WINDOW_SIZE[0], self.STEP):
             lineWidth = 1
             lineColor = GRAY
 
@@ -32,12 +37,20 @@ class Game:
         
         pygame.display.update()
 
+    def _drawNumbers(self, array):
+
+        for i, row in enumerate(array):
+            for j, value in enumerate(row):
+                tile = Tile(self.window, value)
+                tile.draw((j * self.STEP + self.TEXT_BUFFER, i * self.STEP))
+
     
     def start(self):
         run = True
         while run:
 
             for event in pygame.event.get():
+                # Quit the game if the user hits 'x'
                 if event.type == pygame.QUIT:
                     run = False
             
@@ -46,9 +59,29 @@ class Game:
         pygame.quit()
         quit()
 
+class Tile():
+    '''
+    Represents a number for each grid spot
+    '''
+    FONT = pygame.font.SysFont('arial', 45)
+
+    def __init__(self, window: pygame.Surface, value: int):
+        self.window = window
+        self.value = value
+    
+    def draw(self, position: tuple):
+        self.position = position
+        if self.value != 0:
+            text = self.FONT.render(str(self.value), True, WHITE)
+            self.window.blit(text, self.position)
+
+
 
 if __name__ == '__main__':
-    sudoku = Game()
+    with open('grid1.pickle', 'rb') as f:
+        grid1 = pickle.load(f)
+
+    sudoku = Game(grid1)
     sudoku.start()
         
 
