@@ -1,4 +1,4 @@
-import enum
+import random
 import pickle
 import pygame
 from sudoku import Game, Tile
@@ -8,27 +8,39 @@ GREEN = pygame.Color(0, 255, 0)
 class SudokuSolver():
     VALUE_RANGE = range(1, 10)
 
-    def solve(self, grid):
+    def solve(self, grid: list[list[int]]):
         self.grid = grid
         self.game = Game(self.grid)
+        
+        solved = False
+        while not solved:
+            self._assignPossibleValues()
+            self._updateGrid()
+            self._drawGrid()
 
-        self._assignPossibleValues()
-        #self._updateGrid()
-        #self._assignPossibleValues()
+            solved = True
+            for row in self.grid:
+                for value in row:
+                    if value == 0:
+                        solved = False
 
     def _updateGrid(self):
         for i, row in enumerate(self.grid):
             for j, value in enumerate(row):
                 if value not in self.possibleValues[i][j] and len(self.possibleValues[i][j]) == 1:
-                    self.grid[i][j] = self.possibleValues[i][j]
+                    self.grid[i][j] = self.possibleValues[i][j][0]
 
-    def showGrid(self):
+    def _drawGrid(self):
+        r = random.randrange(10, 255)
+        g = random.randrange(10, 255)
+        b = random.randrange(10, 255)
         for i, tileRow in enumerate(self.game.tiles):
             for j, tile in enumerate(tileRow):
                 if tile.value not in self.possibleValues[i][j] and len(self.possibleValues[i][j]) == 1:
                     tile.value = self.possibleValues[i][j][0]
-                    tile.draw(tile.position, GREEN)
+                    tile.draw(tile.position, pygame.Color(r, g, b))
 
+    def showGrid(self):
         self.game.start()
 
 
@@ -56,10 +68,16 @@ class SudokuSolver():
         
 
     def _checkRow(self, index: int) -> list[int]:
+        '''
+        Find values that don't exist in given row
+        '''
         values = [v for v in self.grid[index] if v != 0]
         return self._getPossibleValues(values)
 
     def _checkColumn(self, index: int) -> list[int]:
+        '''
+        Find values that don't exist in given column
+        '''
         values = [row[index] for row in self.grid if row[index] != 0]
         return self._getPossibleValues(values)
 
@@ -92,6 +110,9 @@ class SudokuSolver():
         return self._getPossibleValues(values)
 
     def _getPossibleValues(self, values: list[int]) -> list[int]:
+        '''
+        Helper function to return inverse of listed values
+        '''
         return [i for i in self.VALUE_RANGE if i not in values]
 
 def main():
