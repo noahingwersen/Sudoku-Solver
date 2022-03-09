@@ -38,12 +38,15 @@ class Game:
         pygame.display.update()
 
     def _drawNumbers(self, array):
-
+        self.tiles = []
         for i, row in enumerate(array):
+            tileRow = []
             for j, value in enumerate(row):
                 tile = Tile(self.window, value)
                 tile.draw((j * self.STEP + self.TEXT_BUFFER, i * self.STEP))
+                tileRow.append(tile)
 
+            self.tiles.append(tileRow)
     
     def start(self):
         run = True
@@ -69,10 +72,10 @@ class Tile():
         self.window = window
         self.value = value
     
-    def draw(self, position: tuple):
+    def draw(self, position: tuple, color=WHITE):
         self.position = position
         if self.value != 0:
-            text = self.FONT.render(str(self.value), True, WHITE)
+            text = self.FONT.render(str(self.value), True, color)
             self.window.blit(text, self.position)
 
 
