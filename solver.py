@@ -1,17 +1,28 @@
 import random
 import pickle
 import pygame
+from enum import IntEnum
 from sudoku import Game, Tile
 
 GREEN = pygame.Color(0, 255, 0)
 
+class SolveType(IntEnum):
+    eHeuristic = 0
+    eLinearProgram = 1
+
 class SudokuSolver():
     VALUE_RANGE = range(1, 10)
 
-    def solve(self, grid: list[list[int]]):
+    def solve(self, grid: list[list[int]], method):
         self.grid = grid
         self.game = Game(self.grid)
-        
+
+        if method == SolveType.eHeuristic:
+            self._solve_heuristic()
+        elif method == SolveType.eLinearProgram:
+            pass
+    
+    def _solve_heuristic(self):
         solved = False
         while not solved:
             self._assignPossibleValues()
@@ -22,7 +33,9 @@ class SudokuSolver():
             for row in self.grid:
                 for value in row:
                     if value == 0:
+                        pass
                         solved = False
+
 
     def _updateGrid(self):
         for i, row in enumerate(self.grid):
@@ -116,7 +129,7 @@ class SudokuSolver():
         return [i for i in self.VALUE_RANGE if i not in values]
 
 def main():
-    with open('grid1.pickle', 'rb') as f:
+    with open('grid2.pickle', 'rb') as f:
         grid = pickle.load(f)
     
     solver = SudokuSolver()
