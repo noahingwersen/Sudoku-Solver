@@ -226,7 +226,7 @@ class LinearSolver(SudokuSolver):
                         self.grid[row][col] = val
 
 def main():
-    with open('grid2.pickle', 'rb') as f:
+    with open('grid3.pickle', 'rb') as f:
         grid = pickle.load(f)
     
    # hSolver = HeuristicSolver(grid)
