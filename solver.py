@@ -1,28 +1,23 @@
 import random
 import pickle
 import pygame
-from enum import IntEnum
-from sudoku import Game, Tile
-
-GREEN = pygame.Color(0, 255, 0)
-
-class SolveType(IntEnum):
-    eHeuristic = 0
-    eLinearProgram = 1
+from sudoku import Game
 
 class SudokuSolver():
     VALUE_RANGE = range(1, 10)
 
-    def solve(self, grid: list[list[int]], method):
+    def __init__(self, grid):
         self.grid = grid
         self.game = Game(self.grid)
 
-        if method == SolveType.eHeuristic:
-            self._solve_heuristic()
-        elif method == SolveType.eLinearProgram:
-            pass
+    def showGrid(self):
+        self.game.start()
+
+class HeuristicSolver(SudokuSolver):
+    def __init__(self, grid):
+        super().__init__(grid)
     
-    def _solve_heuristic(self):
+    def solve(self):
         solved = False
         while not solved:
             self._assignPossibleValues()
@@ -35,7 +30,6 @@ class SudokuSolver():
                     if value == 0:
                         pass
                         solved = False
-
 
     def _updateGrid(self):
         for i, row in enumerate(self.grid):
@@ -52,11 +46,7 @@ class SudokuSolver():
                 if tile.value not in self.possibleValues[i][j] and len(self.possibleValues[i][j]) == 1:
                     tile.value = self.possibleValues[i][j][0]
                     tile.draw(tile.position, pygame.Color(r, g, b))
-
-    def showGrid(self):
-        self.game.start()
-
-
+    
     def _assignPossibleValues(self):
         rowValues = []
         colValues = []
@@ -79,7 +69,6 @@ class SudokuSolver():
                     # Add known value only
                     self.possibleValues[i][j].append(item)
         
-
     def _checkRow(self, index: int) -> list[int]:
         '''
         Find values that don't exist in given row
@@ -128,12 +117,14 @@ class SudokuSolver():
         '''
         return [i for i in self.VALUE_RANGE if i not in values]
 
+    
+
 def main():
-    with open('grid2.pickle', 'rb') as f:
+    with open('grid1.pickle', 'rb') as f:
         grid = pickle.load(f)
     
-    solver = SudokuSolver()
-    solver.solve(grid)
+    solver = HeuristicSolver(grid)
+    solver.solve()
     solver.showGrid()
 
 
