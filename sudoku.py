@@ -48,6 +48,9 @@ class Game:
 
             self.tiles.append(tileRow)
     
+    def setTitle(self, title: str):
+        pygame.display.set_caption(title)
+    
     def start(self):
         run = True
         while run:
